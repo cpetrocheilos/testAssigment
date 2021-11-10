@@ -60,9 +60,9 @@ unique_users <- n_distinct(data$user_id)
 unique_users # There are 16932 unique users
 # 
 # Calculate unique users per variations scale
-# user_per_variations <- data %>%
-#   group_by(variation_name) %>%
-#   summarise(users = n_distinct(user_id),.groups = "drop")
+user_per_variations <- data %>%
+  group_by(variation_name) %>%
+  summarise(users = n_distinct(user_id),.groups = "drop")
 # 
 # Data consistency ###################################################################
 
@@ -73,11 +73,34 @@ consistency = data %>%
 library(ggplot2)
 
 ggplot(consistency)+
-  geom_line(aes(x = date, y = obs,col = variation_name))+
+  geom_line(aes(x = date, y = obs,col = variation_name),size=1.3,alpha=0.5)+
   geom_point(aes(x = date, y = obs,col = variation_name))+
-  facet_wrap(~event_key)+
+  facet_wrap(~event_key,nrow = 2)+
   scale_x_date(breaks = '2 days',date_labels = "%d")+
-  scale_y_log10()
+  scale_y_log10(limits = c(1, 10000))+
+  xlab("Date")+ylab('Observations')+
+  ggtitle("Data consistency")+
+  scale_color_manual(values=c('#1B9E77','#D95F02','#666666'))+
+  theme(legend.position = 'bottom',
+        legend.title=element_blank())
+
+# Zoom in 
+g <- ggplot(consistency)+
+  geom_line(aes(x = date, y = obs,col = variation_name),size=0.8)+
+  geom_point(aes(x = date, y = obs,col = variation_name))+
+  facet_wrap(~event_key,nrow = 2)+
+  scale_x_date(breaks = '3 days',date_labels = "%d")+
+  scale_y_log10(limits = c(50, 900))+
+  xlab("Date")+ylab('Observations')+
+  ggtitle("Data consistency")+
+  scale_color_manual(values=c('#1B9E77','#D95F02','#666666'))+
+  theme(legend.position = 'bottom',
+        legend.title=element_blank())
+
+
+ggsave('consistency.jpeg',plot = g,device = "jpeg", units="in", width=7.22, height=8.24, dpi=400)
+
+
 
 #' Findings 
 #' 
